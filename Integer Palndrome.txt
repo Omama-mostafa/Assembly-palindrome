@@ -1,0 +1,108 @@
+.data
+     myArray: .space 80
+     myArray1: .space 80
+     message1: .asciiz "Enter Size of data : "
+     message2: .asciiz "\nEnter Youe Data : \n"
+     message3: .asciiz "Palindrome.\n"
+     message4: .asciiz "Not Palindrome.\n"
+     n: .asciiz "\n"
+.text
+main:
+   li $t0 , 0    # index of array
+   
+   li $v0 , 4    # ask size of array
+   la $a0 , message1
+   syscall
+   
+   li $v0, 5     # get Size
+   syscall
+   
+   addi $t1 , $v0 , 0   # store size
+   
+   li $v0 , 1
+   addi $a0 , $t1 , 0
+   syscall   
+   
+   sll $t1 , $t1 , 2    # multiply size by 4
+
+   li $v0 , 4        # ask to enter data  
+   la $a0 , message2
+   syscall 
+
+while1:          # get data from user and store it in array
+   beq $t0 , $t1 , ConWhile1
+        
+   li $v0 , 5
+   syscall
+
+   sw $v0 , myArray($t0)      
+
+    addi $t0 , $t0 , 4              
+    j while1
+  
+ConWhile1:
+    li $t0 , 0
+    move $t3 , $t1
+    addi $t3 , $t3 , -4
+   
+while2:           # store revers array
+    beq $t0 , $t1 , ConWhile2
+    lw $t2 , myArray($t3)
+    sw $t2 , myArray1($t0)
+     
+    addi $t3 , $t3 , -4
+    addi $t0 , $t0 , 4
+    j while2
+
+ConWhile2:         
+    li $t0 , 0    
+    li $v0 , 4
+    la $a0 , n
+    syscall
+
+while3:    # print revers Array
+    beq $t0 , $t1 , ConWhile3
+      
+    lw $t5 , myArray1($t0)
+    li $v0 , 1
+    move $a0 , $t5
+    syscall
+     
+    li $v0 , 4
+    la $a0 , n
+    syscall
+
+     addi $t0 , $t0 , 4
+     j while3
+ConWhile3:
+    li $t0 , 0
+      
+while4:
+    bne $t6 , $t7 , NotPlandrome
+    beq $t0 , $t1 , ChPlandrome
+    lw $t6 , myArray($t0)
+    lw $t7 , myArray1($t0)
+      
+    addi $t0 , $t0 , 4
+    j while4
+
+NotPlandrome:
+    li $v0 , 4
+    la $a0 , message4
+    syscall
+    b Exit
+
+ChPlandrome:
+    bne $t6 , $t7 , NotPlandrome
+    beq $t6 , $t7 , Plandrome
+
+Plandrome:
+    li $v0 , 4
+    la $a0 , message3
+    syscall 
+    b Exit
+
+Exit:    
+    li $v0 , 10
+    syscall
+.end main
